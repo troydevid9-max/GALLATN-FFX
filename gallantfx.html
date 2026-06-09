@@ -1,0 +1,1934 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gallant FX — GFX Token</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #050a14;
+        --bg2: #080f1e;
+        --bg3: #0c1628;
+        --accent: #14f195;
+        --accent2: #9945ff;
+        --accent3: #00c2ff;
+        --text: #e8f4ff;
+        --muted: #7a93b8;
+        --border: rgba(20, 241, 149, 0.12);
+        --border2: rgba(153, 69, 255, 0.15);
+        --card: rgba(12, 22, 40, 0.85);
+        --glow: 0 0 40px rgba(20, 241, 149, 0.08);
+        --glow2: 0 0 40px rgba(153, 69, 255, 0.1);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Inter", sans-serif;
+        font-size: 15px;
+        line-height: 1.7;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* ─── NOISE TEXTURE ─── */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.4;
+      }
+
+      /* ─── GRID LINES ─── */
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(20, 241, 149, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(20, 241, 149, 0.03) 1px, transparent 1px);
+        background-size: 60px 60px;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: "Manrope", sans-serif;
+        letter-spacing: -0.025em;
+        line-height: 1.2;
+      }
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      /* ─── NAV ─── */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.25rem 2.5rem;
+        background: rgba(5, 10, 20, 0.85);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border);
+      }
+      .logo {
+        font-family: "Manrope", sans-serif;
+        font-weight: 800;
+        font-size: 1.15rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--text);
+      }
+      .logo-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: 7px;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 0.78rem;
+        color: #050a14;
+        font-family: "Manrope", sans-serif;
+      }
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+        list-style: none;
+      }
+      .nav-links a {
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover {
+        color: var(--accent);
+      }
+      .nav-cta {
+        background: var(--accent);
+        color: #050a14;
+        padding: 0.5rem 1.25rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.825rem;
+        font-family: "Manrope", sans-serif;
+        letter-spacing: 0.01em;
+        transition:
+          opacity 0.2s,
+          transform 0.15s;
+      }
+      .nav-cta:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        gap: 5px;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 4px;
+      }
+      .hamburger span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: var(--text);
+        border-radius: 2px;
+        transition: all 0.3s;
+      }
+
+      /* ─── HERO ─── */
+      .hero {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 8rem 2rem 6rem;
+        text-align: center;
+        overflow: hidden;
+      }
+      .hero-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        pointer-events: none;
+      }
+      .hero-orb-1 {
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          rgba(20, 241, 149, 0.12),
+          transparent 70%
+        );
+        top: -100px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .hero-orb-2 {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(
+          circle,
+          rgba(153, 69, 255, 0.1),
+          transparent 70%
+        );
+        bottom: 0;
+        right: -100px;
+      }
+      .hero-orb-3 {
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(
+          circle,
+          rgba(0, 194, 255, 0.08),
+          transparent 70%
+        );
+        bottom: 0;
+        left: -50px;
+      }
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(20, 241, 149, 0.08);
+        border: 1px solid rgba(20, 241, 149, 0.2);
+        padding: 0.35rem 1rem;
+        border-radius: 100px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.72rem;
+        color: var(--accent);
+        margin-bottom: 1.75rem;
+        letter-spacing: 0.07em;
+        animation: fadeUp 0.8s ease both;
+      }
+      .hero-badge-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.4;
+          transform: scale(0.7);
+        }
+      }
+
+      .hero h1 {
+        font-size: clamp(2rem, 4.5vw, 3.25rem);
+        font-weight: 800;
+        line-height: 1.15;
+        max-width: 760px;
+        animation: fadeUp 0.8s 0.1s ease both;
+      }
+      .hero h1 .grad {
+        background: linear-gradient(
+          135deg,
+          var(--accent) 0%,
+          var(--accent3) 50%,
+          var(--accent2) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .hero-sub {
+        font-size: 0.975rem;
+        color: var(--muted);
+        max-width: 520px;
+        margin: 1.25rem auto 2.25rem;
+        line-height: 1.75;
+        animation: fadeUp 0.8s 0.2s ease both;
+      }
+      .hero-btns {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        animation: fadeUp 0.8s 0.3s ease both;
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #050a14;
+        padding: 0.75rem 1.75rem;
+        border-radius: 7px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+        font-family: "Manrope", sans-serif;
+        letter-spacing: 0.01em;
+        transition:
+          opacity 0.2s,
+          transform 0.15s;
+      }
+      .btn-primary:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+      }
+      .btn-outline {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid rgba(232, 244, 255, 0.18);
+        padding: 0.75rem 1.75rem;
+        border-radius: 7px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        font-family: "Manrope", sans-serif;
+        transition:
+          border-color 0.2s,
+          color 0.2s,
+          transform 0.15s;
+      }
+      .btn-outline:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        transform: translateY(-2px);
+      }
+
+      .hero-wallet {
+        margin-top: 3rem;
+        animation: fadeUp 0.8s 0.4s ease both;
+      }
+      .wallet-card {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        padding: 0.75rem 1.25rem;
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+      }
+      .wallet-label {
+        font-size: 0.7rem;
+        color: var(--muted);
+        font-family: "JetBrains Mono", monospace;
+        letter-spacing: 0.05em;
+      }
+      .wallet-addr {
+        font-size: 0.82rem;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--accent);
+      }
+      .copy-btn {
+        background: rgba(20, 241, 149, 0.1);
+        border: 1px solid rgba(20, 241, 149, 0.25);
+        color: var(--accent);
+        padding: 0.3rem 0.75rem;
+        border-radius: 5px;
+        font-size: 0.72rem;
+        font-family: "Manrope", sans-serif;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s;
+        letter-spacing: 0.04em;
+      }
+      .copy-btn:hover {
+        background: rgba(20, 241, 149, 0.2);
+      }
+
+      .hero-stats {
+        display: flex;
+        gap: 3rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 4rem;
+        animation: fadeUp 0.8s 0.5s ease both;
+      }
+      .hero-stat {
+        text-align: center;
+      }
+      .hero-stat-val {
+        font-family: "Manrope", sans-serif;
+        font-size: 1.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--text), var(--muted));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .hero-stat-label {
+        font-size: 0.7rem;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-top: 3px;
+        font-family: "Inter", sans-serif;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ─── SECTIONS ─── */
+      section {
+        position: relative;
+        z-index: 1;
+      }
+      .container {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 2rem;
+      }
+      .section-pad {
+        padding: 6rem 0;
+      }
+
+      .section-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--accent);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 0.85rem;
+      }
+      .section-tag::before {
+        content: "";
+        width: 20px;
+        height: 1px;
+        background: var(--accent);
+      }
+
+      .section-title {
+        font-size: clamp(1.5rem, 3vw, 2.1rem);
+        font-weight: 800;
+        margin-bottom: 0.9rem;
+        letter-spacing: -0.02em;
+      }
+      .section-sub {
+        color: var(--muted);
+        font-size: 0.925rem;
+        max-width: 520px;
+        line-height: 1.75;
+      }
+
+      /* ─── ABOUT ─── */
+      .about-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5rem;
+        align-items: center;
+      }
+      .about-visual {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .about-hex {
+        width: 280px;
+        height: 320px;
+        background: linear-gradient(
+          135deg,
+          rgba(20, 241, 149, 0.08),
+          rgba(153, 69, 255, 0.08)
+        );
+        clip-path: polygon(
+          50% 0%,
+          100% 25%,
+          100% 75%,
+          50% 100%,
+          0% 75%,
+          0% 25%
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(20, 241, 149, 0.15);
+        animation: float 4s ease-in-out infinite;
+      }
+      .about-hex-inner {
+        font-family: "Manrope", sans-serif;
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--accent), var(--accent2));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-align: center;
+      }
+      .about-hex-sub {
+        font-size: 0.7rem;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--muted);
+        text-align: center;
+        letter-spacing: 0.12em;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-14px);
+        }
+      }
+
+      .about-features {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 2rem;
+      }
+      .about-feat {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 1rem 1.25rem;
+        border-radius: 10px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        transition: border-color 0.2s;
+      }
+      .about-feat:hover {
+        border-color: rgba(20, 241, 149, 0.3);
+      }
+      .feat-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        flex-shrink: 0;
+        background: rgba(20, 241, 149, 0.1);
+        border: 1px solid rgba(20, 241, 149, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+      }
+      .feat-title {
+        font-family: "Manrope", sans-serif;
+        font-weight: 700;
+        font-size: 0.9rem;
+        margin-bottom: 3px;
+      }
+      .feat-desc {
+        font-size: 0.84rem;
+        color: var(--muted);
+        line-height: 1.65;
+      }
+
+      /* ─── TOKENOMICS ─── */
+      .token-bg {
+        background: var(--bg2);
+      }
+      .token-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 4rem;
+        align-items: start;
+        margin-top: 3rem;
+      }
+      .token-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .token-table th {
+        text-align: left;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
+        color: var(--muted);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .token-table td {
+        padding: 0.7rem 0;
+        font-size: 0.875rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        vertical-align: middle;
+      }
+      .token-table tr:last-child td {
+        border-bottom: none;
+      }
+      .token-bar-wrap {
+        width: 110px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .token-bar {
+        height: 100%;
+        border-radius: 3px;
+        background: linear-gradient(90deg, var(--accent), var(--accent3));
+      }
+      .token-pct {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.82rem;
+        color: var(--accent);
+        min-width: 40px;
+      }
+
+      .token-info-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+      }
+      .tinfo {
+        padding: 1rem 1.25rem;
+        border-radius: 10px;
+        background: var(--card);
+        border: 1px solid var(--border);
+      }
+      .tinfo-label {
+        font-size: 0.68rem;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 0.3rem;
+      }
+      .tinfo-val {
+        font-family: "Manrope", sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+      }
+      .tinfo-val.green {
+        color: var(--accent);
+      }
+      .tinfo-val.purple {
+        color: var(--accent2);
+      }
+      .tinfo-val.blue {
+        color: var(--accent3);
+      }
+
+      /* ─── ROADMAP ─── */
+      .roadmap-track {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding-left: 2.5rem;
+        margin-top: 3rem;
+      }
+      .roadmap-track::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 12px;
+        bottom: 12px;
+        width: 2px;
+        background: linear-gradient(
+          to bottom,
+          var(--accent),
+          var(--accent2),
+          transparent
+        );
+      }
+      .roadmap-item {
+        position: relative;
+        padding: 1.5rem 1.5rem 1.5rem 2rem;
+        margin-bottom: 1.5rem;
+        border-radius: 12px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        transition:
+          border-color 0.2s,
+          transform 0.2s;
+      }
+      .roadmap-item:hover {
+        border-color: rgba(20, 241, 149, 0.35);
+        transform: translateX(4px);
+      }
+      .roadmap-item::before {
+        content: "";
+        position: absolute;
+        left: -2.5rem;
+        top: 1.75rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 12px rgba(20, 241, 149, 0.6);
+        border: 2px solid var(--bg);
+      }
+      .roadmap-item.done::before {
+        background: var(--accent2);
+      }
+      .roadmap-item.future::before {
+        background: var(--muted);
+        box-shadow: none;
+      }
+      .roadmap-phase {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.68rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+      }
+      .roadmap-phase.p1 {
+        color: var(--accent);
+      }
+      .roadmap-phase.p2 {
+        color: var(--accent3);
+      }
+      .roadmap-phase.p3 {
+        color: var(--accent2);
+      }
+      .roadmap-phase.p4 {
+        color: var(--muted);
+      }
+      .roadmap-title {
+        font-family: "Manrope", sans-serif;
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 0.4rem;
+      }
+      .roadmap-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        margin-top: 0.65rem;
+      }
+      .rm-tag {
+        font-size: 0.72rem;
+        padding: 0.2rem 0.65rem;
+        border-radius: 100px;
+        font-family: "Inter", sans-serif;
+        font-weight: 500;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: var(--muted);
+      }
+      .roadmap-item.active .rm-tag {
+        background: rgba(20, 241, 149, 0.07);
+        border-color: rgba(20, 241, 149, 0.2);
+        color: var(--accent);
+      }
+
+      /* ─── FAQ ─── */
+      .faq-bg {
+        background: var(--bg2);
+      }
+      .faq-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 3rem;
+        max-width: 760px;
+      }
+      .faq-item {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      .faq-q {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.4rem;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-align: left;
+        color: var(--text);
+        font-size: 0.9rem;
+        font-weight: 600;
+        font-family: "Manrope", sans-serif;
+        gap: 1rem;
+        transition: color 0.2s;
+      }
+      .faq-q:hover {
+        color: var(--accent);
+      }
+      .faq-icon {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: rgba(20, 241, 149, 0.1);
+        border: 1px solid rgba(20, 241, 149, 0.25);
+        color: var(--accent);
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.25s;
+      }
+      .faq-item.open .faq-icon {
+        transform: rotate(45deg);
+      }
+      .faq-a {
+        padding: 0 1.4rem;
+        max-height: 0;
+        overflow: hidden;
+        font-size: 0.9rem;
+        color: var(--muted);
+        line-height: 1.75;
+        transition:
+          max-height 0.35s ease,
+          padding 0.35s ease;
+      }
+      .faq-item.open .faq-a {
+        max-height: 200px;
+        padding: 0 1.4rem 1.2rem;
+      }
+
+      /* ─── CONTACT ─── */
+      .contact-wrap {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 4rem;
+        align-items: start;
+        margin-top: 3rem;
+      }
+      .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .contact-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .ci-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 9px;
+        flex-shrink: 0;
+        background: rgba(20, 241, 149, 0.08);
+        border: 1px solid rgba(20, 241, 149, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+      }
+      .ci-label {
+        font-size: 0.68rem;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .ci-val {
+        font-size: 0.9rem;
+        color: var(--text);
+        margin-top: 3px;
+        font-weight: 500;
+      }
+      .social-row {
+        display: flex;
+        gap: 0.65rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+      }
+      .soc-btn {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        padding: 0.5rem 0.9rem;
+        border-radius: 7px;
+        text-decoration: none;
+        color: var(--muted);
+        font-size: 0.8rem;
+        font-weight: 600;
+        font-family: "Manrope", sans-serif;
+        transition:
+          border-color 0.2s,
+          color 0.2s;
+      }
+      .soc-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .contact-form {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 2rem;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        margin-bottom: 1rem;
+      }
+      .form-group label {
+        font-size: 0.68rem;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 7px;
+        padding: 0.65rem 0.9rem;
+        color: var(--text);
+        font-size: 0.875rem;
+        font-family: "Inter", sans-serif;
+        outline: none;
+        transition: border-color 0.2s;
+        resize: vertical;
+      }
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        border-color: var(--accent);
+      }
+      .form-group input::placeholder,
+      .form-group textarea::placeholder {
+        color: rgba(122, 147, 184, 0.4);
+      }
+      .form-group select option {
+        background: #0c1628;
+        color: var(--text);
+      }
+      .submit-btn {
+        width: 100%;
+        background: var(--accent);
+        color: #050a14;
+        border: none;
+        padding: 0.82rem;
+        border-radius: 7px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        font-family: "Manrope", sans-serif;
+        cursor: pointer;
+        letter-spacing: 0.01em;
+        transition:
+          opacity 0.2s,
+          transform 0.15s;
+      }
+      .submit-btn:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+      }
+      .form-note {
+        font-size: 0.75rem;
+        color: var(--muted);
+        text-align: center;
+        margin-top: 0.75rem;
+      }
+
+      /* ─── DIVIDER ─── */
+      .divider {
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--border),
+          transparent
+        );
+      }
+
+      /* ─── TICKER ─── */
+      .ticker-wrap {
+        overflow: hidden;
+        padding: 1rem 0;
+        border-top: 1px solid var(--border);
+        border-bottom: 1px solid var(--border);
+        background: rgba(20, 241, 149, 0.03);
+      }
+      .ticker {
+        display: flex;
+        gap: 3rem;
+        white-space: nowrap;
+        animation: ticker 25s linear infinite;
+      }
+      @keyframes ticker {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(-50%);
+        }
+      }
+      .ticker-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.78rem;
+        color: var(--muted);
+      }
+      .ticker-item .sym {
+        color: var(--accent);
+        font-weight: 500;
+      }
+
+      /* ─── FOOTER ─── */
+      footer {
+        background: var(--bg2);
+        border-top: 1px solid var(--border);
+        padding: 3rem 0 2rem;
+      }
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 3rem;
+        margin-bottom: 3rem;
+      }
+      .footer-brand p {
+        color: var(--muted);
+        font-size: 0.85rem;
+        max-width: 260px;
+        margin-top: 1rem;
+        line-height: 1.7;
+      }
+      .footer-col h4 {
+        font-family: "Manrope", sans-serif;
+        font-size: 0.8rem;
+        font-weight: 700;
+        margin-bottom: 0.9rem;
+        color: var(--text);
+        letter-spacing: 0.02em;
+      }
+      .footer-col a {
+        display: block;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 0.84rem;
+        margin-bottom: 0.45rem;
+        transition: color 0.2s;
+      }
+      .footer-col a:hover {
+        color: var(--accent);
+      }
+      .footer-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.8rem;
+        color: var(--muted);
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+      .footer-bottom .accent {
+        color: var(--accent);
+      }
+
+      /* ─── SCROLL ANIMATIONS ─── */
+      .reveal {
+        opacity: 0;
+        transform: translateY(24px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ─── MOBILE ─── */
+      @media (max-width: 768px) {
+        nav {
+          padding: 1rem 1.25rem;
+        }
+        .nav-links {
+          display: none;
+          position: fixed;
+          inset: 0;
+          top: 64px;
+          background: rgba(5, 10, 20, 0.97);
+          backdrop-filter: blur(20px);
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 2rem;
+          z-index: 99;
+        }
+        .nav-links.open {
+          display: flex;
+        }
+        .nav-links a {
+          font-size: 1.1rem;
+        }
+        .hamburger {
+          display: flex;
+        }
+        .nav-cta {
+          display: none;
+        }
+        .hero {
+          padding: 7rem 1.25rem 5rem;
+        }
+        .hero-stats {
+          gap: 1.5rem;
+        }
+        .about-grid,
+        .token-grid,
+        .contact-wrap,
+        .footer-grid {
+          grid-template-columns: 1fr;
+          gap: 2.5rem;
+        }
+        .about-visual {
+          display: none;
+        }
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+        .footer-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .footer-bottom {
+          text-align: center;
+          justify-content: center;
+        }
+        .section-pad {
+          padding: 4rem 0;
+        }
+      }
+
+      /* ─── TOAST ─── */
+      #toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 999;
+        background: rgba(20, 241, 149, 0.95);
+        color: #050a14;
+        padding: 0.6rem 1.25rem;
+        border-radius: 7px;
+        font-weight: 700;
+        font-size: 0.82rem;
+        font-family: "Manrope", sans-serif;
+        transform: translateY(20px);
+        opacity: 0;
+        transition: all 0.3s ease;
+        pointer-events: none;
+      }
+      #toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- TOAST -->
+    <div id="toast">✓ Wallet address copied!</div>
+
+    <!-- NAV -->
+    <nav>
+      <a href="#" class="logo">
+        <div class="logo-mark">GFX</div>
+        Gallant FX
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#about">About</a></li>
+        <li><a href="#tokenomics">Tokenomics</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <a href="#contact" class="nav-cta">Get Started</a>
+      <button class="hamburger" id="menuBtn" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-orb hero-orb-1"></div>
+      <div class="hero-orb hero-orb-2"></div>
+      <div class="hero-orb hero-orb-3"></div>
+
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Built on Solana · Live on Devnet
+      </div>
+
+      <h1>
+        The Future of<br />
+        <span class="grad">Decentralized Finance</span><br />
+        Starts Here
+      </h1>
+
+      <p class="hero-sub">
+        Gallant FX brings institutional-grade DeFi to everyone. Stake, earn, and
+        grow your GFX tokens in a secure, transparent ecosystem built for the
+        next generation.
+      </p>
+
+      <div class="hero-btns">
+        <a href="#tokenomics" class="btn-primary">Explore GFX Token</a>
+        <a href="#roadmap" class="btn-outline">View Roadmap</a>
+      </div>
+
+      <div class="hero-wallet">
+        <div class="wallet-card">
+          <div>
+            <div class="wallet-label">GFX CONTRACT ADDRESS</div>
+            <div class="wallet-addr" id="walletAddr">GFXmain...soon2024</div>
+          </div>
+          <button class="copy-btn" id="copyBtn" onclick="copyWallet()">
+            COPY
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-val">1B</div>
+          <div class="hero-stat-label">Total Supply</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">22.5%</div>
+          <div class="hero-stat-label">APY Rewards</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">3</div>
+          <div class="hero-stat-label">Staking Tiers</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">SOL</div>
+          <div class="hero-stat-label">Network</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TICKER -->
+    <div class="ticker-wrap">
+      <div class="ticker">
+        <span class="ticker-item"
+          ><span class="sym">GFX</span> · Gallant FX Token · Staking Live</span
+        >
+        <span class="ticker-item"
+          ><span class="sym">SOL</span> · Powered by Solana · Sub-second
+          Finality</span
+        >
+        <span class="ticker-item"
+          ><span class="sym">APY</span> · Up to 22.5% Annual Rewards</span
+        >
+        <span class="ticker-item"
+          ><span class="sym">DAO</span> · Community Governed Treasury</span
+        >
+        <span class="ticker-item"
+          ><span class="sym">GFX</span> · 1,000,000,000 Fixed Supply</span
+        >
+        <span class="ticker-item"
+          ><span class="sym">SEC</span> · Multisig · Audited Smart
+          Contracts</span
+        >
+        <!-- duplicate for seamless loop -->
+        <span class="ticker-item"
+          ><span class="sym">GFX</span> · Gallant FX Token · Staking Live</span
+        >
+        <span class="ticker-item"
+          ><span class="sym">SOL</span> · Powered by Solana · Sub-second
+          Finality</span
+        >
+        <span class="ticker-item"
+          ><span class="sym">APY</span> · Up to 22.5% Annual Rewards</span
+        >
+        <span class="ticker-item"
+          ><span class="sym">DAO</span> · Community Governed Treasury</span
+        >
+        <span class="ticker-item"
+          ><span class="sym">GFX</span> · 1,000,000,000 Fixed Supply</span
+        >
+        <span class="ticker-item"
+          ><span class="sym">SEC</span> · Multisig · Audited Smart
+          Contracts</span
+        >
+      </div>
+    </div>
+
+    <!-- ABOUT -->
+    <section class="section-pad" id="about">
+      <div class="container">
+        <div class="about-grid">
+          <div>
+            <div class="section-tag reveal">About Gallant FX</div>
+            <h2 class="section-title reveal">
+              A DeFi Ecosystem<br />Built for Everyone
+            </h2>
+            <p class="section-sub reveal">
+              Gallant FX is a community-first DeFi protocol on Solana designed
+              to make staking, earning, and token trading accessible,
+              transparent, and rewarding for all participants.
+            </p>
+            <div class="about-features">
+              <div class="about-feat reveal">
+                <div class="feat-icon">🛡️</div>
+                <div>
+                  <div class="feat-title">Multisig Security</div>
+                  <div class="feat-desc">
+                    All treasury operations require multi-signature approval.
+                    Your assets are protected by smart contract audits and DAO
+                    oversight.
+                  </div>
+                </div>
+              </div>
+              <div class="about-feat reveal">
+                <div class="feat-icon">⚡</div>
+                <div>
+                  <div class="feat-title">Solana Speed</div>
+                  <div class="feat-desc">
+                    Experience sub-second transaction finality and near-zero
+                    fees. Solana's architecture makes micro-rewards and instant
+                    claims economically viable.
+                  </div>
+                </div>
+              </div>
+              <div class="about-feat reveal">
+                <div class="feat-icon">🏛️</div>
+                <div>
+                  <div class="feat-title">DAO Governance</div>
+                  <div class="feat-desc">
+                    GFX holders vote on protocol upgrades, reward rates, and
+                    treasury allocations. True ownership means a true voice.
+                  </div>
+                </div>
+              </div>
+              <div class="about-feat reveal">
+                <div class="feat-icon">💎</div>
+                <div>
+                  <div class="feat-title">Fixed Supply</div>
+                  <div class="feat-desc">
+                    With a hard cap of 1 billion GFX tokens, there is no
+                    inflation. Scarcity is built into the protocol from genesis.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="about-visual reveal">
+            <div class="about-hex">
+              <div>
+                <div class="about-hex-inner">GFX</div>
+                <div class="about-hex-sub">GALLANT FX</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- TOKENOMICS -->
+    <section class="section-pad token-bg" id="tokenomics">
+      <div class="container">
+        <div class="section-tag reveal">Token Economics</div>
+        <h2 class="section-title reveal">GFX Tokenomics</h2>
+        <p class="section-sub reveal">
+          A transparent, fair distribution designed for long-term ecosystem
+          growth and community ownership.
+        </p>
+
+        <div class="token-grid">
+          <div class="reveal">
+            <table class="token-table">
+              <thead>
+                <tr>
+                  <th>Allocation</th>
+                  <th>Tokens</th>
+                  <th>%</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Community & Staking</td>
+                  <td>
+                    <span
+                      class="mono"
+                      style="color: var(--muted); font-size: 0.82rem"
+                      >400,000,000</span
+                    >
+                  </td>
+                  <td class="token-pct">40%</td>
+                  <td>
+                    <div class="token-bar-wrap">
+                      <div class="token-bar" style="width: 40%"></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Ecosystem Fund</td>
+                  <td>
+                    <span
+                      class="mono"
+                      style="color: var(--muted); font-size: 0.82rem"
+                      >200,000,000</span
+                    >
+                  </td>
+                  <td class="token-pct">20%</td>
+                  <td>
+                    <div class="token-bar-wrap">
+                      <div class="token-bar" style="width: 20%"></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Team & Advisors</td>
+                  <td>
+                    <span
+                      class="mono"
+                      style="color: var(--muted); font-size: 0.82rem"
+                      >150,000,000</span
+                    >
+                  </td>
+                  <td class="token-pct">15%</td>
+                  <td>
+                    <div class="token-bar-wrap">
+                      <div class="token-bar" style="width: 15%"></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Liquidity Pools</td>
+                  <td>
+                    <span
+                      class="mono"
+                      style="color: var(--muted); font-size: 0.82rem"
+                      >150,000,000</span
+                    >
+                  </td>
+                  <td class="token-pct">15%</td>
+                  <td>
+                    <div class="token-bar-wrap">
+                      <div class="token-bar" style="width: 15%"></div>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Public Sale</td>
+                  <td>
+                    <span
+                      class="mono"
+                      style="color: var(--muted); font-size: 0.82rem"
+                      >100,000,000</span
+                    >
+                  </td>
+                  <td class="token-pct">10%</td>
+                  <td>
+                    <div class="token-bar-wrap">
+                      <div class="token-bar" style="width: 10%"></div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="token-info-cards reveal">
+            <div class="tinfo">
+              <div class="tinfo-label">Total Supply</div>
+              <div class="tinfo-val green mono">1,000,000,000 GFX</div>
+            </div>
+            <div class="tinfo">
+              <div class="tinfo-label">Blockchain</div>
+              <div class="tinfo-val blue">Solana (SPL Token)</div>
+            </div>
+            <div class="tinfo">
+              <div class="tinfo-label">Staking APY Range</div>
+              <div class="tinfo-val green">8% – 22.5%</div>
+            </div>
+            <div class="tinfo">
+              <div class="tinfo-label">Lock Periods</div>
+              <div class="tinfo-val purple">30 · 60 · 90 Days</div>
+            </div>
+            <div class="tinfo">
+              <div class="tinfo-label">Token Standard</div>
+              <div class="tinfo-val">SPL Token-2022</div>
+            </div>
+            <div class="tinfo">
+              <div class="tinfo-label">Governance</div>
+              <div class="tinfo-val">DAO · Multisig Treasury</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- ROADMAP -->
+    <section class="section-pad" id="roadmap">
+      <div class="container">
+        <div class="section-tag reveal">Development Plan</div>
+        <h2 class="section-title reveal">Roadmap</h2>
+        <p class="section-sub reveal">
+          A phased approach to building a complete DeFi ecosystem, step by step,
+          with community at the center of every decision.
+        </p>
+
+        <div class="roadmap-track">
+          <div class="roadmap-item done reveal">
+            <div class="roadmap-phase p1">Phase 1 — Q3 2024 · Completed</div>
+            <div class="roadmap-title">Foundation & Token Launch</div>
+            <p style="font-size: 0.88rem; color: var(--muted)">
+              The bedrock of the GFX ecosystem — token creation, legal
+              structuring, and community formation.
+            </p>
+            <div class="roadmap-list">
+              <span class="rm-tag">GFX Token Deployment</span>
+              <span class="rm-tag">Smart Contract Audit</span>
+              <span class="rm-tag">Team Formation</span>
+              <span class="rm-tag">Website Launch</span>
+              <span class="rm-tag">Community Channels</span>
+            </div>
+          </div>
+
+          <div class="roadmap-item active reveal">
+            <div class="roadmap-phase p2">Phase 2 — Q1 2025 · In Progress</div>
+            <div class="roadmap-title">Staking Protocol & dApp Launch</div>
+            <p style="font-size: 0.88rem; color: var(--muted)">
+              Full staking functionality with reward distribution, multiple lock
+              tiers, and wallet connectivity goes live.
+            </p>
+            <div class="roadmap-list">
+              <span class="rm-tag">Staking Smart Contracts</span>
+              <span class="rm-tag">Wallet Integration</span>
+              <span class="rm-tag">Devnet Beta</span>
+              <span class="rm-tag">Reward Dashboard</span>
+              <span class="rm-tag">Referral System</span>
+            </div>
+          </div>
+
+          <div class="roadmap-item reveal">
+            <div class="roadmap-phase p3">Phase 3 — Q2 2025 · Upcoming</div>
+            <div class="roadmap-title">Liquidity & Trading Features</div>
+            <p style="font-size: 0.88rem; color: var(--muted)">
+              GFX becomes tradeable on Solana's leading DEX aggregator, with
+              native swap and liquidity pool management.
+            </p>
+            <div class="roadmap-list">
+              <span class="rm-tag">Jupiter Integration</span>
+              <span class="rm-tag">Liquidity Pools</span>
+              <span class="rm-tag">LP Token Rewards</span>
+              <span class="rm-tag">Swap Interface</span>
+            </div>
+          </div>
+
+          <div class="roadmap-item future reveal">
+            <div class="roadmap-phase p4">Phase 4 — Q3–Q4 2025 · Planned</div>
+            <div class="roadmap-title">
+              DAO Governance & Ecosystem Expansion
+            </div>
+            <p style="font-size: 0.88rem; color: var(--muted)">
+              Full community governance, cross-chain bridges, and third-party
+              protocol integrations to expand the GFX ecosystem.
+            </p>
+            <div class="roadmap-list">
+              <span class="rm-tag">On-chain Voting</span>
+              <span class="rm-tag">Treasury DAO</span>
+              <span class="rm-tag">Cross-chain Bridge</span>
+              <span class="rm-tag">Ecosystem Grants</span>
+              <span class="rm-tag">Mobile App</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- FAQ -->
+    <section class="section-pad faq-bg" id="faq">
+      <div class="container">
+        <div class="section-tag reveal">Common Questions</div>
+        <h2 class="section-title reveal">FAQ</h2>
+
+        <div class="faq-list" id="faqList">
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              What is Gallant FX and the GFX token?
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Gallant FX is a decentralized finance (DeFi) protocol built on the
+              Solana blockchain. GFX is its native utility token used for
+              staking, governance, and earning rewards within the ecosystem.
+              With a fixed supply of 1 billion tokens, GFX is designed for
+              long-term value accrual.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              How does GFX staking work?
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-a">
+              You deposit GFX tokens into our smart contract and choose a lock
+              period — 30, 60, or 90 days. Longer lock periods earn higher
+              reward multipliers up to 22.5% APY. Rewards are calculated
+              automatically and can be claimed at any time. Early unstaking is
+              possible with a penalty fee.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Which wallets are supported?
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Gallant FX supports all major Solana wallets including Phantom,
+              Solflare, and Backpack. Any wallet that supports SPL tokens can
+              hold GFX. We recommend Phantom for the best experience with the
+              dApp.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Is the platform secure? Has it been audited?
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-a">
+              Security is our top priority. All smart contracts are undergoing
+              independent third-party audits before mainnet launch. Treasury
+              funds are protected by multi-signature controls requiring multiple
+              keyholders to approve transactions. Audit reports will be publicly
+              available.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              Where can I buy GFX tokens?
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-a">
+              GFX tokens can be acquired through our upcoming public sale and
+              will be available to swap on Jupiter Aggregator after our Phase 3
+              launch. To participate in early access or the public sale, join
+              our community channels and watch for official announcements.
+              Always use the contract address listed on this site.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">
+              How does the DAO governance work?
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-a">
+              GFX holders will be able to submit and vote on governance
+              proposals covering protocol parameters, treasury spending, and
+              platform upgrades. Voting power is proportional to staked GFX
+              balance. DAO governance will launch in Phase 4 of the roadmap.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- CONTACT -->
+    <section class="section-pad" id="contact">
+      <div class="container">
+        <div class="section-tag reveal">Get in Touch</div>
+        <h2 class="section-title reveal">Contact Us</h2>
+        <p class="section-sub reveal">
+          Have questions, partnership inquiries, or want to join the team? Reach
+          out — we'd love to hear from you.
+        </p>
+
+        <div class="contact-wrap">
+          <div class="contact-info reveal">
+            <div class="contact-item">
+              <div class="ci-icon">📧</div>
+              <div>
+                <div class="ci-label">Email</div>
+                <div class="ci-val">hello@gallantfx.io</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="ci-icon">💬</div>
+              <div>
+                <div class="ci-label">Telegram Community</div>
+                <div class="ci-val">t.me/GallantFXOfficial</div>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="ci-icon">🐦</div>
+              <div>
+                <div class="ci-label">Twitter / X</div>
+                <div class="ci-val">@GallantFX_SOL</div>
+              </div>
+            </div>
+            <div>
+              <div class="ci-label" style="margin-bottom: 0.75rem">
+                Follow Us
+              </div>
+              <div class="social-row">
+                <a href="#" class="soc-btn">𝕏 Twitter</a>
+                <a href="#" class="soc-btn">✈ Telegram</a>
+                <a href="#" class="soc-btn">🔵 Discord</a>
+                <a href="#" class="soc-btn">▶ YouTube</a>
+                <a href="#" class="soc-btn">💼 LinkedIn</a>
+              </div>
+            </div>
+            <div>
+              <div class="ci-label" style="margin-bottom: 0.75rem">
+                GFX Wallet for Manual Payments
+              </div>
+              <div class="wallet-card" style="display: inline-flex">
+                <div>
+                  <div class="wallet-label">SOL PAYMENT ADDRESS</div>
+                  <div class="wallet-addr" id="payAddr">GFXmain...soon2024</div>
+                </div>
+                <button class="copy-btn" onclick="copyPayAddr()">COPY</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-form reveal">
+            <h3
+              style="
+                font-family: &quot;Manrope&quot;, sans-serif;
+                font-weight: 700;
+                font-size: 1rem;
+                margin-bottom: 1.4rem;
+                letter-spacing: -0.01em;
+              "
+            >
+              Send a Message
+            </h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" placeholder="John" />
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" placeholder="Doe" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" placeholder="john@email.com" />
+            </div>
+            <div class="form-group">
+              <label>Subject</label>
+              <select>
+                <option value="">Select a topic...</option>
+                <option>General Inquiry</option>
+                <option>Partnership / Investment</option>
+                <option>Technical Support</option>
+                <option>Token Sale</option>
+                <option>Media / Press</option>
+                <option>Join the Team</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Message</label>
+              <textarea
+                rows="4"
+                placeholder="Tell us more about your inquiry..."
+              ></textarea>
+            </div>
+            <button class="submit-btn" onclick="submitForm(this)">
+              Send Message →
+            </button>
+            <p class="form-note">
+              We typically respond within 24–48 hours during business days.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <a href="#" class="logo">
+              <div class="logo-mark">GFX</div>
+              Gallant FX
+            </a>
+            <p>
+              A community-first DeFi protocol on Solana. Stake, earn, and grow
+              with GFX — the token for the next generation of decentralized
+              finance.
+            </p>
+          </div>
+          <div class="footer-col">
+            <h4>Platform</h4>
+            <a href="#about">About</a>
+            <a href="#tokenomics">Tokenomics</a>
+            <a href="#roadmap">Roadmap</a>
+            <a href="#faq">FAQ</a>
+          </div>
+          <div class="footer-col">
+            <h4>Community</h4>
+            <a href="#">Twitter</a>
+            <a href="#">Telegram</a>
+            <a href="#">Discord</a>
+            <a href="#">YouTube</a>
+          </div>
+          <div class="footer-col">
+            <h4>Legal</h4>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Risk Disclaimer</a>
+            <a href="#">Cookie Policy</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span
+            >© 2024 Gallant FX. All rights reserved. Built on
+            <span class="accent">Solana</span>.</span
+          >
+          <span>GFX is not financial advice. Always DYOR.</span>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // NAV MOBILE
+      const menuBtn = document.getElementById("menuBtn");
+      const navLinks = document.getElementById("navLinks");
+      menuBtn.onclick = () => {
+        navLinks.classList.toggle("open");
+        const spans = menuBtn.querySelectorAll("span");
+        if (navLinks.classList.contains("open")) {
+          spans[0].style.transform = "rotate(45deg) translate(5px,5px)";
+          spans[1].style.opacity = "0";
+          spans[2].style.transform = "rotate(-45deg) translate(5px,-5px)";
+        } else {
+          spans.forEach((s) => {
+            s.style.transform = "";
+            s.style.opacity = "";
+          });
+        }
+      };
+      navLinks.querySelectorAll("a").forEach(
+        (a) =>
+          (a.onclick = () => {
+            navLinks.classList.remove("open");
+            menuBtn.querySelectorAll("span").forEach((s) => {
+              s.style.transform = "";
+              s.style.opacity = "";
+            });
+          }),
+      );
+
+      // COPY WALLET
+      const WALLET_ADDR = "GFXmain1111111111111111111111111111soon2024";
+      function copyWallet() {
+        navigator.clipboard.writeText(WALLET_ADDR).catch(() => {});
+        showToast();
+        const btn = document.getElementById("copyBtn");
+        btn.textContent = "✓";
+        setTimeout(() => (btn.textContent = "COPY"), 2000);
+      }
+      function copyPayAddr() {
+        navigator.clipboard.writeText(WALLET_ADDR).catch(() => {});
+        showToast();
+      }
+      function showToast() {
+        const t = document.getElementById("toast");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2500);
+      }
+
+      // FAQ
+      function toggleFaq(btn) {
+        const item = btn.closest(".faq-item");
+        const isOpen = item.classList.contains("open");
+        document
+          .querySelectorAll(".faq-item.open")
+          .forEach((i) => i.classList.remove("open"));
+        if (!isOpen) item.classList.add("open");
+      }
+
+      // CONTACT FORM
+      function submitForm(btn) {
+        btn.textContent = "Sending...";
+        btn.style.opacity = ".7";
+        setTimeout(() => {
+          btn.textContent = "✓ Message Sent!";
+          btn.style.background = "rgba(20,241,149,0.2)";
+          btn.style.color = "var(--accent)";
+          btn.style.border = "1px solid rgba(20,241,149,.4)";
+        }, 1200);
+      }
+
+      // SCROLL REVEAL
+      const reveals = document.querySelectorAll(".reveal");
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("visible");
+              observer.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -40px 0px" },
+      );
+      reveals.forEach((r) => observer.observe(r));
+
+      // NAV SCROLL COLOR
+      window.addEventListener("scroll", () => {
+        document.querySelector("nav").style.borderBottomColor =
+          window.scrollY > 50
+            ? "rgba(20,241,149,0.18)"
+            : "rgba(20,241,149,0.08)";
+      });
+    </script>
+  </body>
+</html>
